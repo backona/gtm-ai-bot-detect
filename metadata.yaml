@@ -5,6 +5,10 @@ homepage: "https://backona.com"
 documentation: "https://github.com/backona/gtm-ai-bot-detect/blob/master/README.md"
 
 versions: []
+  - sha: 0b6ba75427f795029ca6d5d8499f1ee14d19697b
+    changeNotes: |
+      ### Changed
+      - gtag user properties and events run before the data layer push so GTM tags on backona_bot_detect receive user properties on the same hit
   - sha: 33b76501ac3c7dd81dc5065f3ec40f5e6f610d03
     changeNotes: |
       ### Added

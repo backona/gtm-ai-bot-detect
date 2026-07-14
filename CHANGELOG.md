@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automatically by the Github Action script.
 
 ## [<NEW_VERSION>] - <VERSION_DATE>
+### Added
+### Changed
+### Fixed
+
+## [0.1.2] - 2026-07-14 (by @slazak)
 ### Changed
 - gtag user properties and events run before the data layer push so GTM tags on backona_bot_detect receive user properties on the same hit
 

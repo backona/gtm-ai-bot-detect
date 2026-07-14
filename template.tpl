@@ -50,7 +50,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "probeScriptUrl",
     "displayName": "Probe script URL",
     "simpleValueType": true,
-    "defaultValue": "https://cdn.jsdelivr.net/gh/backona/backona-gtm-ai-bot-detect@main/probe.js",
+    "defaultValue": "https://cdn.jsdelivr.net/gh/backona/gtm-ai-bot-detect@master/probe.js",
     "valueValidators": [
       {
         "type": "NON_EMPTY"
@@ -244,7 +244,7 @@ scenarios:
 
     runCode({
       eventName: 'backona_bot_detect',
-      probeScriptUrl: 'https://cdn.jsdelivr.net/gh/backona/backona-gtm-ai-bot-detect@main/probe.js',
+      probeScriptUrl: 'https://cdn.jsdelivr.net/gh/backona/gtm-ai-bot-detect@master/probe.js',
       checkUserAgent: true,
       additionalAiMarkers: ['MyAIBot']
     });
@@ -253,7 +253,7 @@ scenarios:
     assertThat(configValue.eventName).isEqualTo('backona_bot_detect');
     assertThat(configValue.checkUserAgent).isEqualTo(true);
     assertThat(configValue.additionalAiMarkers).isEqualTo(['MyAIBot']);
-    assertThat(injectedUrl).isEqualTo('https://cdn.jsdelivr.net/gh/backona/backona-gtm-ai-bot-detect@main/probe.js');
+    assertThat(injectedUrl).isEqualTo('https://cdn.jsdelivr.net/gh/backona/gtm-ai-bot-detect@master/probe.js');
 - name: fails when probe script url is empty
   code: |-
     let failed;

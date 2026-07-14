@@ -69,7 +69,7 @@ Enable **Also send to Google tag (gtag)** in the tag (off by default). When `win
 
 Optional **Measurement ID** scopes both calls to one GA4 property (`send_to` on events; `gtag('config', ID, …)` for user properties).
 
-The data layer push always runs. gtag is skipped silently if `gtag` is not on the page. Timing is the same as the data layer event (after `probe.js` loads) — it does not update GTM tags that already fired.
+The data layer push always runs after optional gtag calls. gtag is skipped silently if `gtag` is not on the page. User properties are set before the data layer event so GTM tags on `backona_bot_detect` can carry `up.*` on the same hit; tags that fired earlier are unchanged.
 
 ### Automation-only detection
 

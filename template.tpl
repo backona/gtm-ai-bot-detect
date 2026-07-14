@@ -84,6 +84,67 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "GROUP",
+    "name": "gtagGroup",
+    "displayName": "Google tag (gtag)",
+    "groupStyle": "NO_ZIPPY",
+    "subParams": [
+      {
+        "type": "CHECKBOX",
+        "name": "pushToGtag",
+        "checkboxText": "Also send to Google tag (gtag)",
+        "simpleValueType": true,
+        "defaultValue": false,
+        "help": "When enabled, probe.js calls window.gtag if it exists. Skipped silently when gtag is not on the page. Does not replace the data layer push."
+      },
+      {
+        "type": "GROUP",
+        "name": "gtagSettings",
+        "displayName": "Google tag settings",
+        "groupStyle": "ZIPPY_CLOSED",
+        "enablingConditions": [
+          {
+            "paramName": "pushToGtag",
+            "paramValue": true,
+            "type": "EQUALS"
+          }
+        ],
+        "subParams": [
+          {
+            "type": "CHECKBOX",
+            "name": "pushGtagUserProperties",
+            "checkboxText": "Set gtag user properties (ai_bot_status, ai_bot_is_bot)",
+            "simpleValueType": true,
+            "defaultValue": true,
+            "help": "Calls gtag('set', 'user_properties', ...). Applies to subsequent hits on the client. Register user-scoped custom dimensions in GA4 Admin if you use these in reports."
+          },
+          {
+            "type": "CHECKBOX",
+            "name": "pushGtagEvent",
+            "checkboxText": "Send gtag custom event (same name as data layer event)",
+            "simpleValueType": true,
+            "defaultValue": true,
+            "help": "Calls gtag('event', eventName, { ai_bot_status, ai_bot_is_bot }). Useful for GA4 event-scoped parameters without waiting for GTM to read the data layer."
+          },
+          {
+            "type": "TEXT",
+            "name": "gtagMeasurementId",
+            "displayName": "Measurement ID (optional)",
+            "simpleValueType": true,
+            "canBeEmptyString": true,
+            "valueHint": "G-XXXXXXXXXX",
+            "help": "Leave empty for global gtag('set', ...). When set, user properties use gtag('config', ID, ...) and events include send_to for that destination."
+          },
+          {
+            "type": "LABEL",
+            "name": "hintGtagTiming",
+            "displayName": "gtag calls run after probe.js loads (same timing as the data layer event). They do not update GTM tags that already fired. For the first page_view, self-host probe.js in page head or fire GA4 page_view after backona_bot_detect."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "GROUP",
     "name": "aiCrawlerGroup",
     "displayName": "AI crawler detection",
     "groupStyle": "NO_ZIPPY",
@@ -144,7 +205,11 @@ setInWindow(
   {
     eventName: data.eventName || 'backona_bot_detect',
     checkUserAgent: data.checkUserAgent !== false,
-    additionalAiMarkers: data.additionalAiMarkers || []
+    additionalAiMarkers: data.additionalAiMarkers || [],
+    pushToGtag: data.pushToGtag === true,
+    pushGtagUserProperties: data.pushGtagUserProperties !== false,
+    pushGtagEvent: data.pushGtagEvent !== false,
+    gtagMeasurementId: data.gtagMeasurementId || ''
   },
   true
 );
@@ -254,20 +319,19 @@ scenarios:
     assertThat(configValue.checkUserAgent).isEqualTo(true);
     assertThat(configValue.additionalAiMarkers).isEqualTo(['MyAIBot']);
     assertThat(injectedUrl).isEqualTo('https://cdn.jsdelivr.net/gh/backona/gtm-ai-bot-detect@master/probe.js');
-- name: fails when probe script url is empty
+- name: calls gtmOnFailure when injectScript fails
   code: |-
-    let failed;
-
     mock('setInWindow', function() {});
 
-    runCode({
-      probeScriptUrl: '',
-      gtmOnFailure: function() {
-        failed = true;
-      }
+    mock('injectScript', function(url, onSuccess, onFailure) {
+      onFailure();
     });
 
-    assertThat(failed).isEqualTo(true);
+    runCode({
+      probeScriptUrl: 'https://cdn.jsdelivr.net/gh/backona/gtm-ai-bot-detect@master/probe.js'
+    });
+
+    assertApi('gtmOnFailure').wasCalled();
 - name: disables ai crawler check when checkbox is off
   code: |-
     let configValue;
@@ -286,6 +350,30 @@ scenarios:
     });
 
     assertThat(configValue.checkUserAgent).isEqualTo(false);
+- name: passes gtag options in probe config when enabled
+  code: |-
+    let configValue;
+
+    mock('setInWindow', function(key, value) {
+      configValue = value;
+    });
+
+    mock('injectScript', function(url, onSuccess) {
+      onSuccess();
+    });
+
+    runCode({
+      probeScriptUrl: 'https://example.com/probe.js',
+      pushToGtag: true,
+      pushGtagUserProperties: true,
+      pushGtagEvent: true,
+      gtagMeasurementId: 'G-TEST123'
+    });
+
+    assertThat(configValue.pushToGtag).isEqualTo(true);
+    assertThat(configValue.pushGtagUserProperties).isEqualTo(true);
+    assertThat(configValue.pushGtagEvent).isEqualTo(true);
+    assertThat(configValue.gtagMeasurementId).isEqualTo('G-TEST123');
 
 ___NOTES___
 

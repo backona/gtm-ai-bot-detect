@@ -1,0 +1,146 @@
+name: Release GTM Gallery template
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths-ignore:
+      - CHANGELOG.md
+      - metadata.yaml
+      - .github/workflows/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Version, changelog, and gallery metadata
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Ensure latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Detect template.tpl changes
+        id: template
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            if PREV=$(git describe --tags --abbrev=0 2>/dev/null); then
+              if git diff --name-only "$PREV" HEAD | grep -qx 'template.tpl'; then
+                echo changed=true >> $GITHUB_OUTPUT
+              else
+                echo changed=false >> $GITHUB_OUTPUT
+              fi
+            else
+              echo changed=true >> $GITHUB_OUTPUT
+            fi
+          else
+            if git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD | grep -qx 'template.tpl'; then
+              echo changed=true >> $GITHUB_OUTPUT
+            else
+              echo changed=false >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.7.1
+        with:
+          release-branch: main
+
+      - name: Set version
+        run: echo VERSION=${{ steps.version.outputs.version }} >> $GITHUB_ENV
+
+      - name: Echo version
+        run: echo $VERSION
+
+      - name: Update CHANGELOG version and date (first occurrence in the file only). Prepare for new version.
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ACTOR="${{ github.actor }}"
+          else
+            ACTOR="${{ github.event.pull_request.merged_by.login }}"
+          fi
+          if [ -z "$ACTOR" ]; then
+            echo "No merge author found; refusing to release."
+            exit 1
+          fi
+          sed -i '0,/<NEW_VERSION>/ s//'"$VERSION"'/' CHANGELOG.md
+          sed -i '0,/<VERSION_DATE>/ s//'"$(date +'%Y-%m-%d')"' (by @'"$ACTOR"')/' CHANGELOG.md
+          sed -i '10i\
+          ## [<NEW_VERSION>] - <VERSION_DATE>\
+          ### Added\
+          ### Changed\
+          ### Fixed\
+          ' CHANGELOG.md
+
+      - name: Extract Release Notes
+        id: extract_notes
+        run: |
+          NOTES=$(awk "/## \[$VERSION\]/{p=1;next} /## \[/{p=0} p" CHANGELOG.md)
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Git Commit/Push release
+        uses: actions-x/commit@v6
+        with:
+          files: CHANGELOG.md
+          message: Release version ${{ env.VERSION }}
+
+      - name: Prepend gallery metadata version
+        if: steps.template.outputs.changed == 'true'
+        run: |
+          SHA=$(git rev-parse HEAD)
+          NOTES=$(awk "/## \[$VERSION\]/{p=1;next} /## \[/{p=0} p" CHANGELOG.md)
+
+          {
+            echo "  - sha: $SHA"
+            echo "    changeNotes: |"
+            if [ -n "$NOTES" ]; then
+              while IFS= read -r line || [ -n "$line" ]; do
+                if [ -z "$line" ]; then
+                  echo ""
+                else
+                  echo "      $line"
+                fi
+              done <<< "$NOTES"
+            fi
+          } > /tmp/new_gallery_version.yaml
+
+          awk '
+            /^versions:/ {
+              print
+              while ((getline line < "/tmp/new_gallery_version.yaml") > 0) print line
+              close("/tmp/new_gallery_version.yaml")
+              next
+            }
+            { print }
+          ' metadata.yaml > metadata.yaml.new
+          mv metadata.yaml.new metadata.yaml
+
+      - name: Git Commit/Push gallery metadata
+        if: steps.template.outputs.changed == 'true'
+        uses: actions-x/commit@v6
+        with:
+          files: metadata.yaml
+          message: Prepend gallery version to metadata.yaml (${{ env.VERSION }})
+
+      - name: Tag and Release
+        uses: avakar/tag-and-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          body: ${{ steps.extract_notes.outputs.release_notes }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

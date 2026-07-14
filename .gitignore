@@ -1,0 +1,18 @@
+# Public repo: Gallery-required files + release workflow.
+# https://developers.google.com/tag-platform/tag-manager/templates/gallery
+
+*
+
+!.gitignore
+!template.tpl
+!metadata.yaml
+!LICENSE
+!README.md
+!CHANGELOG.md
+!.github/
+!.github/**
+!package.json
+!package-lock.json
+!probe.js
+!tests/
+!tests/**

@@ -1,0 +1,23 @@
+{
+  "name": "backona-gtm-ai-bot-detect-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:bots": "node tests/run-all.mjs",
+    "test:automation": "node tests/run-automation-compare.mjs",
+    "test:playwright": "node tests/run-playwright.mjs",
+    "test:puppeteer": "node tests/run-puppeteer.mjs",
+    "test:selenium": "node tests/run-selenium.mjs",
+    "test:firecrawl": "node tests/run-firecrawl.mjs",
+    "build:tpl": "node gtm-template/ai-bot-detect/build-tpl.js"
+  },
+  "devDependencies": {
+    "@mendable/firecrawl-js": "^1.21.1",
+    "playwright": "^1.51.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer": "^24.6.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "selenium-webdriver": "^4.31.0"
+  }
+}

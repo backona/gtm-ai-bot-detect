@@ -9,6 +9,11 @@ Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automa
 
 ## [<NEW_VERSION>] - <VERSION_DATE>
 ### Added
+### Changed
+### Fixed
+
+## [0.1.1] - 2026-07-14 (by @slazak)
+### Added
 - Optional Google tag (gtag) output: user properties and custom event with ai_bot_status and ai_bot_is_bot, configurable measurement ID
 ### Changed
 ### Fixed

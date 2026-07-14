@@ -9,5 +9,5 @@ Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automa
 
 ## [<NEW_VERSION>] - <VERSION_DATE>
 ### Added
-- AI Bots, Crawlers, and Automated Browsers Detector by Backona single GTM tag template: page-context detection via probe.js, data layer push with ai_bot_status and ai_bot_is_bot, custom event trigger support, AI crawler matching, GA4 guidance, and git-tracked probe.js for CDN delivery
+- AI Bots, Crawlers, and Automated Browsers Detector by Backona single GTM tag template: page-context detection via probe.js from backona/gtm-ai-bot-detect on jsDelivr, data layer push with ai_bot_status and ai_bot_is_bot, custom event trigger support, AI crawler matching, and GA4 guidance
 - Playwright (plain and stealth), Puppeteer (plain and stealth), Selenium, and Firecrawl probe scripts to compare automation signals on backona.com

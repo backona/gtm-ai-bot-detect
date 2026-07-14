@@ -58,6 +58,19 @@ On a downstream tag (triggered by `backona_bot_detect`):
 
 Register `ai_bot_status` in GA4 Admin as an **event-scoped custom dimension** for reporting.
 
+### Google tag (gtag) — optional
+
+Enable **Also send to Google tag (gtag)** in the tag (off by default). When `window.gtag` exists, `probe.js` also:
+
+| Option | gtag call | GA4 use |
+|--------|-----------|---------|
+| **User properties** (default on) | `gtag('set', 'user_properties', { ai_bot_status, ai_bot_is_bot })` | User-scoped dimensions on **subsequent** hits |
+| **Custom event** (default on) | `gtag('event', eventName, { ai_bot_status, ai_bot_is_bot })` | Event-scoped parameters on that gtag event |
+
+Optional **Measurement ID** scopes both calls to one GA4 property (`send_to` on events; `gtag('config', ID, …)` for user properties).
+
+The data layer push always runs. gtag is skipped silently if `gtag` is not on the page. Timing is the same as the data layer event (after `probe.js` loads) — it does not update GTM tags that already fired.
+
 ### Automation-only detection
 
 Uncheck **Check user agent for AI crawlers** in the tag to skip GPTBot-style UA matching. Automation signals still populate `ai_bot_status`.

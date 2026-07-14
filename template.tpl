@@ -137,7 +137,7 @@ ___TEMPLATE_PARAMETERS___
           {
             "type": "LABEL",
             "name": "hintGtagTiming",
-            "displayName": "gtag calls run after probe.js loads (same timing as the data layer event). They do not update GTM tags that already fired. For the first page_view, self-host probe.js in page head or fire GA4 page_view after backona_bot_detect."
+            "displayName": "gtag user properties are set before the data layer event so GTM tags triggered on backona_bot_detect can include up.* on the same hit. They do not update tags that already fired. For the first page_view, self-host probe.js in page head or fire GA4 page_view after backona_bot_detect."
           }
         ]
       }

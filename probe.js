@@ -239,12 +239,12 @@
   }
 
   function publishResults(detailedStatus, isBot) {
+    pushToGtag(detailedStatus, isBot);
     pushResult({
       event: eventName,
       ai_bot_status: detailedStatus,
       ai_bot_is_bot: isBot
     });
-    pushToGtag(detailedStatus, isBot);
   }
 
   try {

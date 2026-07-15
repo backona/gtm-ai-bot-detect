@@ -46,11 +46,6 @@ ___TEMPLATE_PARAMETERS___
     "help": "Custom event name pushed to the data layer together with ai_bot_status and ai_bot_is_bot. Use a Custom Event trigger with this name for tags that must wait for detection to finish."
   },
   {
-    "type": "LABEL",
-    "name": "hintGa4UserProperties",
-    "displayName": "Configure User Properties on your GA4 Configuration or Event tags: map ai_bot_status and ai_bot_is_bot from Data Layer Variables. Register matching user-scoped custom dimensions in GA4 Admin."
-  },
-  {
     "type": "TEXT",
     "name": "probeScriptUrl",
     "displayName": "Probe script URL",
@@ -73,7 +68,7 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "LABEL",
         "name": "hintDataLayerKeys",
-        "displayName": "This tag pushes event (your event name above), ai_bot_status (string detailed status such as false, hidden_bot, ai_bot:GPTBot), and ai_bot_is_bot (boolean). Create Data Layer Variables for ai_bot_status and ai_bot_is_bot. Fire this tag on Initialization or Consent Initialization."
+        "displayName": "This tag pushes event (your event name above), ai_bot_status (string detailed status such as false, hidden_bot, integrated_browser:Cursor, ai_bot:GPTBot), and ai_bot_is_bot (boolean). Create Data Layer Variables for ai_bot_status and ai_bot_is_bot. Fire this tag on Initialization or Consent Initialization."
       },
       {
         "type": "LABEL",

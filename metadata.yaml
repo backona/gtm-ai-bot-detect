@@ -5,6 +5,10 @@ homepage: "https://backona.com"
 documentation: "https://github.com/backona/gtm-ai-bot-detect/blob/master/README.md"
 
 versions: []
+  - sha: a165bb9b7367188e6cdec47a692b49573a71beda
+    changeNotes: |
+      ### Changed
+      - Template UI: GA4 User Properties hint in tag config, data layer event name always visible
   - sha: 7e7599f05a17edfdef50500b727ddd4b788f413c
     changeNotes: |
       ### Changed

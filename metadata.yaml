@@ -5,6 +5,11 @@ homepage: "https://backona.com"
 documentation: "https://github.com/backona/gtm-ai-bot-detect/blob/master/README.md"
 
 versions: []
+  - sha: 7e7599f05a17edfdef50500b727ddd4b788f413c
+    changeNotes: |
+      ### Changed
+      - Removed optional gtag output from template and probe.js; use data layer variables with GTM GA4 tag event parameters or user properties instead
+      - README: suggested GA4 page_view configuration with user-scoped properties for bot tracking
   - sha: 0b6ba75427f795029ca6d5d8499f1ee14d19697b
     changeNotes: |
       ### Changed

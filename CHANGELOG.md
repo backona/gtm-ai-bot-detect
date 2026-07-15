@@ -10,7 +10,8 @@ Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automa
 ## [<NEW_VERSION>] - <VERSION_DATE>
 ### Changed
 - Removed optional gtag output from template and probe.js; use data layer variables with GTM GA4 tag event parameters or user properties instead
-- README: suggested GA4 page_view configuration with user-scoped properties for bot tracking
+- README: suggested GA4 page_view configuration with user-scoped properties; Google Tag auto page_view hint and custom definition descriptions
+- Template UI: GA4 User Properties hint in tag config, data layer event name always visible
 
 ## [0.1.2] - 2026-07-14 (by @slazak)
 ### Changed

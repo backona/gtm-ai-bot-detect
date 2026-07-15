@@ -35,9 +35,9 @@ Use **user-scoped properties** on a delayed `page_view` tag. Once set, GA4 attac
 ### Flow
 
 ```
-Initialization          →  Detector tag injects probe.js
+Initialization        →  Detector tag injects probe.js
 backona_bot_detect    →  dataLayer: ai_bot_status, ai_bot_is_bot
-                        →  GA4 page_view fires (user properties set)
+                      →  GA4 page_view fires (user properties set)
 Later events          →  carry up.ai_bot_* on subsequent hits
 ```
 
@@ -78,16 +78,24 @@ Create two **Data Layer Variables** (Version 2):
 
 ### 4. Disable the early page_view
 
-If you already fire `page_view` on **All Pages** or **Container Loaded**, disable or remove it. That hit runs before detection and will not include bot data. Keep only the delayed `page_view` on `backona_bot_detect`.
+Turn off any `page_view` that fires **before** bot detection completes. That hit is sent without `up.ai_bot_*` and will duplicate your delayed `page_view`. Keep only the one on `backona_bot_detect`.
+
+**GTM GA4 Event tag** — disable or remove a separate tag that sends `page_view` on **All Pages**, **Initialization**, or **Container Loaded**.
+
+**Google Tag configuration tag** — open your GA4 **Google tag** / **Configuration** tag and uncheck **Send a page view event when this configuration loads** (wording may vary by tag type). That automatic page view fires as soon as the config tag runs, before `backona_bot_detect`.
 
 ### 5. GA4 Admin custom definitions
 
-**Admin → Data display → Custom definitions**
+User properties sent from GTM (`up.ai_bot_status`, `up.ai_bot_is_bot`) are not visible in standard GA4 reports until you register them. **Custom definitions** tell GA4 to store and expose those fields for exploration, reporting, and audiences.
 
-| Display name | Scope | Field name |
-|--------------|-------|------------|
-| AI Bot Status | User | `ai_bot_status` |
-| AI Bot Is Bot | User | `ai_bot_is_bot` |
+**Admin → Data display → Custom definitions → Create custom dimension**
+
+| Display name | Scope | User property | Description |
+|--------------|-------|---------------|-------------|
+| AI Bot Status | User | `ai_bot_status` | Detailed bot classification for the visitor from Backona bot detection (e.g. false, hidden_bot, ai_bot:GPTBot). |
+| AI Bot Is Bot | User | `ai_bot_is_bot` | Boolean flag indicating whether the visitor was classified as a bot by Backona bot detection. |
+
+Copy the **Description** value into the Description field when creating each custom dimension in GA4 Admin. Scope must be **User** — these values come from user properties on the delayed `page_view`, not from event parameters. The **User property** name must match the GTM User Properties field exactly.
 
 ### 6. Verify in GTM Preview
 

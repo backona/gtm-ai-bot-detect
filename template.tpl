@@ -46,6 +46,11 @@ ___TEMPLATE_PARAMETERS___
     "help": "Custom event name pushed to the data layer together with ai_bot_status and ai_bot_is_bot. Use a Custom Event trigger with this name for tags that must wait for detection to finish."
   },
   {
+    "type": "LABEL",
+    "name": "hintGa4UserProperties",
+    "displayName": "Configure User Properties on your GA4 Configuration or Event tags: map ai_bot_status and ai_bot_is_bot from Data Layer Variables. Register matching user-scoped custom dimensions in GA4 Admin."
+  },
+  {
     "type": "TEXT",
     "name": "probeScriptUrl",
     "displayName": "Probe script URL",
@@ -74,11 +79,6 @@ ___TEMPLATE_PARAMETERS___
         "type": "LABEL",
         "name": "hintTriggers",
         "displayName": "Trigger examples: Custom Event equals backona_bot_detect for tags that need detection before firing; ai_bot_is_bot equals false to exclude bots; ai_bot_status equals hidden_bot for stealth bots; ai_bot_status contains ai_bot: for AI crawlers."
-      },
-      {
-        "type": "LABEL",
-        "name": "hintGa4",
-        "displayName": "Recommended GA4 setup: fire page_view on backona_bot_detect with User Properties ai_bot_status and ai_bot_is_bot from Data Layer Variables. See README Suggested configuration for GA4 bot tracking."
       }
     ]
   },
@@ -97,28 +97,20 @@ ___TEMPLATE_PARAMETERS___
         "help": "When enabled, matches known AI crawler user agents such as GPTBot, ChatGPT-User, ClaudeBot, and PerplexityBot. When disabled, detection is limited to browser automation signals only."
       },
       {
-        "type": "GROUP",
-        "name": "aiCrawlerSettings",
-        "displayName": "AI crawler settings",
-        "groupStyle": "ZIPPY_CLOSED",
+        "type": "TEXT",
+        "name": "additionalAiMarkers",
+        "displayName": "Additional AI bot markers (Optional)",
+        "simpleValueType": true,
+        "canBeEmptyString": true,
+        "lineCount": 4,
+        "textAsList": true,
+        "valueHint": "MyAIBot",
+        "help": "Extra strings to match in navigator.userAgent, one per row. Case-insensitive substring match.",
         "enablingConditions": [
           {
             "paramName": "checkUserAgent",
             "paramValue": true,
             "type": "EQUALS"
-          }
-        ],
-        "subParams": [
-          {
-            "type": "TEXT",
-            "name": "additionalAiMarkers",
-            "displayName": "Additional AI bot markers",
-            "simpleValueType": true,
-            "canBeEmptyString": true,
-            "lineCount": 4,
-            "textAsList": true,
-            "valueHint": "MyAIBot",
-            "help": "Optional strings to match in navigator.userAgent, one per row. Case-insensitive substring match."
           }
         ]
       }

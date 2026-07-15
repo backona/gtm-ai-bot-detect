@@ -18,8 +18,6 @@ Release history: [CHANGELOG.md](./CHANGELOG.md).
 4. **Variables** → New → **Data Layer Variable** → Data Layer Variable Name: `ai_bot_is_bot` (Data Layer Version 2)
 5. **Submit/Publish** the container
 
-> **Why a tag, not a variable?** GTM sandboxed templates cannot read `navigator.*`. The tag injects `probe.js` in page context and pushes results to the data layer. See [permissions.md](./gtm-template/ai-bot-detect/permissions.md).
-
 ## Data layer output
 
 | Key | Type | Human visitor | Bot / crawler |
@@ -29,6 +27,74 @@ Release history: [CHANGELOG.md](./CHANGELOG.md).
 | `ai_bot_is_bot` | boolean | `false` | `true` |
 
 > **Important:** `ai_bot_status` uses the string `'false'` for humans, not boolean `false`. Use `ai_bot_is_bot` for boolean trigger logic.
+
+## Suggested configuration for GA4 bot tracking
+
+Use **user-scoped properties** on a delayed `page_view` tag. Once set, GA4 attaches `up.ai_bot_status` and `up.ai_bot_is_bot` to that hit and to later events (scroll, click, conversion, etc.) without mapping bot fields on every tag. Register user-scoped custom dimensions in GA4 Admin for reporting and audiences.
+
+### Flow
+
+```
+Initialization          →  Detector tag injects probe.js
+backona_bot_detect    →  dataLayer: ai_bot_status, ai_bot_is_bot
+                        →  GA4 page_view fires (user properties set)
+Later events          →  carry up.ai_bot_* on subsequent hits
+```
+
+### 1. Data Layer Variables
+
+Create two **Data Layer Variables** (Version 2):
+
+| Variable name | Data Layer Variable Name |
+|---------------|--------------------------|
+| `DLV - ai_bot_status` | `ai_bot_status` |
+| `DLV - ai_bot_is_bot` | `ai_bot_is_bot` |
+
+### 2. Trigger
+
+**Triggers → New → Custom Event**
+
+| Field | Value |
+|-------|-------|
+| Event name | `backona_bot_detect` |
+
+### 3. GA4 Page View tag
+
+**Tags → New** (or repurpose your existing `page_view` tag)
+
+| Field | Value |
+|-------|-------|
+| Tag type | Google Analytics: GA4 Event |
+| Configuration tag | Your GA4 config tag |
+| Event name | `page_view` |
+| Trigger | Custom Event `backona_bot_detect` |
+
+**User Properties**
+
+| Property name | Value |
+|---------------|-------|
+| `ai_bot_status` | `{{DLV - ai_bot_status}}` |
+| `ai_bot_is_bot` | `{{DLV - ai_bot_is_bot}}` |
+
+### 4. Disable the early page_view
+
+If you already fire `page_view` on **All Pages** or **Container Loaded**, disable or remove it. That hit runs before detection and will not include bot data. Keep only the delayed `page_view` on `backona_bot_detect`.
+
+### 5. GA4 Admin custom definitions
+
+**Admin → Data display → Custom definitions**
+
+| Display name | Scope | Field name |
+|--------------|-------|------------|
+| AI Bot Status | User | `ai_bot_status` |
+| AI Bot Is Bot | User | `ai_bot_is_bot` |
+
+### 6. Verify in GTM Preview
+
+1. Select **`backona_bot_detect`** in the event timeline.
+2. **Variables** tab — confirm DLV values (e.g. `ai_bot_status` = `false` on a normal browser).
+3. **Tags** tab — confirm the `page_view` tag fired.
+4. **Hit Details** — look for `up.ai_bot_status` and `up.ai_bot_is_bot`.
 
 ## Trigger and tag patterns
 
@@ -49,27 +115,7 @@ Create a **Custom Event** trigger: Event name equals `backona_bot_detect` (or yo
 | Stealth bots | `ai_bot_status` **equals** `hidden_bot` |
 | Any AI crawler | `ai_bot_status` **contains** `ai_bot:` |
 
-### GA4
-
-On a downstream tag (triggered by `backona_bot_detect`):
-
-- Event parameter `ai_bot_status` → `{{DLV - ai_bot_status}}`
-- Or `ai_bot_is_bot` → `{{DLV - ai_bot_is_bot}}`
-
-Register `ai_bot_status` in GA4 Admin as an **event-scoped custom dimension** for reporting.
-
-### Google tag (gtag) — optional
-
-Enable **Also send to Google tag (gtag)** in the tag (off by default). When `window.gtag` exists, `probe.js` also:
-
-| Option | gtag call | GA4 use |
-|--------|-----------|---------|
-| **User properties** (default on) | `gtag('set', 'user_properties', { ai_bot_status, ai_bot_is_bot })` | User-scoped dimensions on **subsequent** hits |
-| **Custom event** (default on) | `gtag('event', eventName, { ai_bot_status, ai_bot_is_bot })` | Event-scoped parameters on that gtag event |
-
-Optional **Measurement ID** scopes both calls to one GA4 property (`send_to` on events; `gtag('config', ID, …)` for user properties).
-
-The data layer push always runs after optional gtag calls. gtag is skipped silently if `gtag` is not on the page. User properties are set before the data layer event so GTM tags on `backona_bot_detect` can carry `up.*` on the same hit; tags that fired earlier are unchanged.
+See [Suggested configuration for GA4 bot tracking](#suggested-configuration-for-ga4-bot-tracking) for the recommended `page_view` + user property setup.
 
 ### Automation-only detection
 

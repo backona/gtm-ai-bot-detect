@@ -202,44 +202,7 @@
     window.dataLayer.push(payload);
   }
 
-  function pushToGtag(detailedStatus, isBot) {
-    if (!config.pushToGtag || typeof gtag !== 'function') {
-      return;
-    }
-
-    var params = {
-      ai_bot_status: detailedStatus,
-      ai_bot_is_bot: isBot
-    };
-    var measurementId = config.gtagMeasurementId;
-    if (typeof measurementId === 'string') {
-      measurementId = measurementId.trim();
-    } else {
-      measurementId = '';
-    }
-
-    if (config.pushGtagUserProperties !== false) {
-      if (measurementId) {
-        gtag('config', measurementId, { user_properties: params });
-      } else {
-        gtag('set', 'user_properties', params);
-      }
-    }
-
-    if (config.pushGtagEvent !== false) {
-      var eventParams = {
-        ai_bot_status: detailedStatus,
-        ai_bot_is_bot: isBot
-      };
-      if (measurementId) {
-        eventParams.send_to = measurementId;
-      }
-      gtag('event', eventName, eventParams);
-    }
-  }
-
   function publishResults(detailedStatus, isBot) {
-    pushToGtag(detailedStatus, isBot);
     pushResult({
       event: eventName,
       ai_bot_status: detailedStatus,

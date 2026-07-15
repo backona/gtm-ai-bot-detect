@@ -78,68 +78,7 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "LABEL",
         "name": "hintGa4",
-        "displayName": "GA4: map ai_bot_status or ai_bot_is_bot as an event parameter on downstream tags. Register ai_bot_status in GA4 Admin as an event-scoped custom dimension for reporting and audiences."
-      }
-    ]
-  },
-  {
-    "type": "GROUP",
-    "name": "gtagGroup",
-    "displayName": "Google tag (gtag)",
-    "groupStyle": "NO_ZIPPY",
-    "subParams": [
-      {
-        "type": "CHECKBOX",
-        "name": "pushToGtag",
-        "checkboxText": "Also send to Google tag (gtag)",
-        "simpleValueType": true,
-        "defaultValue": false,
-        "help": "When enabled, probe.js calls window.gtag if it exists. Skipped silently when gtag is not on the page. Does not replace the data layer push."
-      },
-      {
-        "type": "GROUP",
-        "name": "gtagSettings",
-        "displayName": "Google tag settings",
-        "groupStyle": "ZIPPY_CLOSED",
-        "enablingConditions": [
-          {
-            "paramName": "pushToGtag",
-            "paramValue": true,
-            "type": "EQUALS"
-          }
-        ],
-        "subParams": [
-          {
-            "type": "CHECKBOX",
-            "name": "pushGtagUserProperties",
-            "checkboxText": "Set gtag user properties (ai_bot_status, ai_bot_is_bot)",
-            "simpleValueType": true,
-            "defaultValue": true,
-            "help": "Calls gtag('set', 'user_properties', ...). Applies to subsequent hits on the client. Register user-scoped custom dimensions in GA4 Admin if you use these in reports."
-          },
-          {
-            "type": "CHECKBOX",
-            "name": "pushGtagEvent",
-            "checkboxText": "Send gtag custom event (same name as data layer event)",
-            "simpleValueType": true,
-            "defaultValue": true,
-            "help": "Calls gtag('event', eventName, { ai_bot_status, ai_bot_is_bot }). Useful for GA4 event-scoped parameters without waiting for GTM to read the data layer."
-          },
-          {
-            "type": "TEXT",
-            "name": "gtagMeasurementId",
-            "displayName": "Measurement ID (optional)",
-            "simpleValueType": true,
-            "canBeEmptyString": true,
-            "valueHint": "G-XXXXXXXXXX",
-            "help": "Leave empty for global gtag('set', ...). When set, user properties use gtag('config', ID, ...) and events include send_to for that destination."
-          },
-          {
-            "type": "LABEL",
-            "name": "hintGtagTiming",
-            "displayName": "gtag user properties are set before the data layer event so GTM tags triggered on backona_bot_detect can include up.* on the same hit. They do not update tags that already fired. For the first page_view, self-host probe.js in page head or fire GA4 page_view after backona_bot_detect."
-          }
-        ]
+        "displayName": "Recommended GA4 setup: fire page_view on backona_bot_detect with User Properties ai_bot_status and ai_bot_is_bot from Data Layer Variables. See README Suggested configuration for GA4 bot tracking."
       }
     ]
   },
@@ -205,11 +144,7 @@ setInWindow(
   {
     eventName: data.eventName || 'backona_bot_detect',
     checkUserAgent: data.checkUserAgent !== false,
-    additionalAiMarkers: data.additionalAiMarkers || [],
-    pushToGtag: data.pushToGtag === true,
-    pushGtagUserProperties: data.pushGtagUserProperties !== false,
-    pushGtagEvent: data.pushGtagEvent !== false,
-    gtagMeasurementId: data.gtagMeasurementId || ''
+    additionalAiMarkers: data.additionalAiMarkers || []
   },
   true
 );
@@ -350,30 +285,6 @@ scenarios:
     });
 
     assertThat(configValue.checkUserAgent).isEqualTo(false);
-- name: passes gtag options in probe config when enabled
-  code: |-
-    let configValue;
-
-    mock('setInWindow', function(key, value) {
-      configValue = value;
-    });
-
-    mock('injectScript', function(url, onSuccess) {
-      onSuccess();
-    });
-
-    runCode({
-      probeScriptUrl: 'https://example.com/probe.js',
-      pushToGtag: true,
-      pushGtagUserProperties: true,
-      pushGtagEvent: true,
-      gtagMeasurementId: 'G-TEST123'
-    });
-
-    assertThat(configValue.pushToGtag).isEqualTo(true);
-    assertThat(configValue.pushGtagUserProperties).isEqualTo(true);
-    assertThat(configValue.pushGtagEvent).isEqualTo(true);
-    assertThat(configValue.gtagMeasurementId).isEqualTo('G-TEST123');
 
 ___NOTES___
 

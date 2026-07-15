@@ -5,6 +5,10 @@ homepage: "https://backona.com"
 documentation: "https://github.com/backona/gtm-ai-bot-detect/blob/master/README.md"
 
 versions: []
+  - sha: f53518bacecd45d73c0cc64e5718fb57e7bafa16
+    changeNotes: |
+      ### Changed
+      - Removed GA4 User Properties hint label from template tag configuration UI
   - sha: a165bb9b7367188e6cdec47a692b49573a71beda
     changeNotes: |
       ### Changed

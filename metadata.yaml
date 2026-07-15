@@ -13,8 +13,6 @@ versions: []
     changeNotes: |
       ### Added
       - Optional Google tag (gtag) output: user properties and custom event with ai_bot_status and ai_bot_is_bot, configurable measurement ID
-      ### Changed
-      ### Fixed
   - sha: 6e4677ce27cc7cc83e176fdc468d6ed91c838258
     changeNotes: |
       ### Added

@@ -22,6 +22,7 @@
     'YouBot',
     'Amazonbot',
     'Google-Extended',
+    'Cursor',
     'Timpibot',
     'MindriftBot',
     'VelenPublicWebCrawler',
@@ -119,7 +120,7 @@
     }
 
     if (webdriver === true) {
-      return 'true';
+      return 'webdriver';
     }
 
     if (webdriverGetterNative === false || webdriverOwnProperty) {
@@ -166,7 +167,7 @@
 
   function isBotSignal(status) {
     if (
-      status === 'true' ||
+      status === 'webdriver' ||
       status === 'hidden_bot' ||
       status === 'tampered_bot' ||
       status === 'automation_leak' ||
@@ -185,7 +186,7 @@
 
     if (
       aiBotStatus &&
-      (automationStatus === 'true' ||
+      (automationStatus === 'webdriver' ||
         automationStatus === 'hidden_bot' ||
         automationStatus === 'tampered_bot' ||
         automationStatus === 'automation_leak' ||

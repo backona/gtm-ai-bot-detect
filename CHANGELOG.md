@@ -9,8 +9,11 @@ Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automa
 
 ## [<NEW_VERSION>] - <VERSION_DATE>
 ### Added
+- README: meaning of each ai_bot_status value, including combined automation and AI crawler statuses
 ### Changed
-### Fixed
+- ai_bot_status reports `webdriver` when navigator.webdriver is true, instead of the string `true`
+- Data layer event name is always visible in the GTM tag summary
+- Predefined AI crawler user agents include Cursor; config-page markers are appended and each built-in user agent still resolves to its own ai_bot name
 
 ## [0.1.5] - 2026-07-15 (by @slazak)
 ### Changed

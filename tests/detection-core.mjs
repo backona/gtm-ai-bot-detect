@@ -1,7 +1,7 @@
 export const TARGET_URL = process.env.BOT_PROBE_URL || 'https://backona.com/';
 
 export const BOT_AUTOMATION_STATUSES = [
-  'true',
+  'webdriver',
   'hidden_bot',
   'tampered_bot',
   'automation_leak',
@@ -42,7 +42,7 @@ export function runBotProbe() {
   if (webdriver === undefined && !descriptor) {
     automationStatus = 'hidden_bot';
   } else if (webdriver === true) {
-    automationStatus = 'true';
+    automationStatus = 'webdriver';
   } else if (webdriverGetterNative === false || webdriverOwnProperty) {
     automationStatus = 'tampered_bot';
   } else if (automationKeys.length > 0) {

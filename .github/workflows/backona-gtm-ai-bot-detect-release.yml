@@ -121,7 +121,7 @@ jobs:
 
           awk '
             /^versions:/ {
-              print
+              print "versions:"
               while ((getline line < "/tmp/new_gallery_version.yaml") > 0) print line
               close("/tmp/new_gallery_version.yaml")
               next

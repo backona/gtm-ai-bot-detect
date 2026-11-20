@@ -9,6 +9,7 @@
     "test:puppeteer": "node tests/run-puppeteer.mjs",
     "test:selenium": "node tests/run-selenium.mjs",
     "test:firecrawl": "node tests/run-firecrawl.mjs",
+    "test:markers": "node tests/ai-marker-list.mjs",
     "build:tpl": "node gtm-template/ai-bot-detect/build-tpl.js"
   },
   "devDependencies": {

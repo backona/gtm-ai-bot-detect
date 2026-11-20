@@ -2,7 +2,7 @@
 
 Google Tag Manager **tag** template to detect automation and AI crawlers. Built by [Backona](https://backona.com).
 
-Uses a **stealth trap** on `navigator.webdriver`: if the value is `undefined` and the `Navigator.prototype` descriptor is missing, the visit is flagged as `hidden_bot`. Also checks `navigator.webdriver === true`, non-native `webdriver` getters (`tampered_bot`), automation leak keys on `window` (`automation_leak`), `HeadlessChrome` in the user agent (`headless_ua`), and matches known AI crawler user agents.
+Uses a **stealth trap** on `navigator.webdriver`: if the value is `undefined` and the `Navigator.prototype` descriptor is missing, the visit is flagged as `hidden_bot`. `navigator.webdriver === true` is flagged as `webdriver`. Also checks non-native `webdriver` getters (`tampered_bot`), automation leak keys on `window` (`automation_leak`), `HeadlessChrome` in the user agent (`headless_ua`), and matches known AI crawler user agents.
 
 Detection runs in page context via [`probe.js`](./probe.js). Results are pushed to the **data layer** — no separate variable template required.
 
@@ -23,10 +23,30 @@ Release history: [CHANGELOG.md](./CHANGELOG.md).
 | Key | Type | Human visitor | Bot / crawler |
 |-----|------|---------------|---------------|
 | `event` | string | `backona_bot_detect` | same |
-| `ai_bot_status` | string | `false` | `true`, `hidden_bot`, `tampered_bot`, `automation_leak`, `headless_ua`, `ai_bot:GPTBot`, `true\|ai_bot:GPTBot`, … |
+| `ai_bot_status` | string | `false` | `webdriver`, `hidden_bot`, `tampered_bot`, `automation_leak`, `headless_ua`, `ai_bot:GPTBot`, `webdriver\|ai_bot:GPTBot`, … |
 | `ai_bot_is_bot` | boolean | `false` | `true` |
 
 > **Important:** `ai_bot_status` uses the string `'false'` for humans, not boolean `false`. Use `ai_bot_is_bot` for boolean trigger logic.
+
+### What each status means
+
+Automation checks run in the order below. The first match is the automation status. If the user agent also matches an AI crawler, that marker is appended after `|`.
+
+| Status | When it is set | `ai_bot_is_bot` |
+|--------|----------------|-----------------|
+| `false` | No automation signal and no AI crawler user agent. A normal browser: `navigator.webdriver` is `false`, the native getter is still on `Navigator.prototype`, and the user agent is not a known crawler. | `false` |
+| `webdriver` | `navigator.webdriver === true`. Selenium, Puppeteer, Playwright, and similar tools set that flag when they do not hide it. | `true` |
+| `hidden_bot` | `navigator.webdriver` is `undefined` and `Navigator.prototype` has no `webdriver` descriptor. Stealth tooling removed the property instead of leaving the native `false`. | `true` |
+| `tampered_bot` | The `webdriver` getter is not native (`Function.prototype.toString` does not contain `[native code]`), or `webdriver` was added as an own property on the `navigator` object. A patched getter used to spoof a human browser. | `true` |
+| `automation_leak` | `window` has a property left by an automation driver. Names starting with `cdc_`, `__playwright`, `__pw`, `__puppeteer`, `__webdriver`, `__driver`, `__selenium`, or `callPhantom`. Also a `_`-prefixed name ending in `_Array`, `_Object`, `_Promise`, `_Proxy`, `_Symbol`, `_JSON`, or `_Window` (ChromeDriver artifacts such as `cdc_adoQpoasnfa76pfcZLmcfl_Array`). | `true` |
+| `headless_ua` | The user agent contains `HeadlessChrome`. Checked only when none of the signals above matched. | `true` |
+| `ai_bot:<name>` | Stored on its own when the user agent matches a crawler marker and every automation check returned `false`. The probe ran, `navigator.webdriver` is the normal `false`, and the user agent still contains `GPTBot`, `ClaudeBot`, another marker from the list below, or a custom marker. Example: `ai_bot:GPTBot`. A crawler that never executes JavaScript never pushes this event. If an automation signal is present as well, the value is the combined form below instead. | `true` |
+| `<signal>\|ai_bot:<name>` | An automation signal and an AI crawler marker both matched. The automation status comes first. `webdriver\|ai_bot:GPTBot` means `navigator.webdriver === true` and the user agent contains `GPTBot`. `hidden_bot\|ai_bot:ClaudeBot` means the `webdriver` property was removed and the user agent contains `ClaudeBot`. | `true` |
+| `unknown` | Detection threw before a result could be built. | `false` |
+
+Only one automation status is reported. A visit with `navigator.webdriver === true` and a `cdc_` leak is `webdriver`, because that check runs first.
+
+`ai_bot:` matching is skipped when **Check user agent for AI crawlers** is unchecked. Custom markers from **AI crawler settings** use the same `ai_bot:<marker>` form.
 
 ## Suggested configuration for GA4 bot tracking
 
@@ -120,6 +140,7 @@ Create a **Custom Event** trigger: Event name equals `backona_bot_detect` (or yo
 | Goal | Condition |
 |------|-----------|
 | Humans only | `ai_bot_status` **equals** `false` |
+| WebDriver | `ai_bot_status` **equals** `webdriver` |
 | Stealth bots | `ai_bot_status` **equals** `hidden_bot` |
 | Any AI crawler | `ai_bot_status` **contains** `ai_bot:` |
 
@@ -131,7 +152,7 @@ Uncheck **Check user agent for AI crawlers** in the tag to skip GPTBot-style UA 
 
 ## AI crawlers detected
 
-GPTBot, ChatGPT-User, OAI-SearchBot, ClaudeBot, anthropic-ai, PerplexityBot, cohere-ai, Bytespider, CCBot, meta-externalagent, FacebookBot, Applebot-Extended, Diffbot, YouBot, Amazonbot, Google-Extended, and others. Add custom markers under **AI crawler settings**.
+GPTBot, ChatGPT-User, OAI-SearchBot, ClaudeBot, anthropic-ai, PerplexityBot, cohere-ai, Bytespider, CCBot, meta-externalagent, FacebookBot, Applebot-Extended, Diffbot, YouBot, Amazonbot, Google-Extended, Cursor, and others. Add custom markers under **AI crawler settings**. A match on `Cursor` is reported as `ai_bot:Cursor`.
 
 ## Local automation probes
 

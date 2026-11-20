@@ -37,6 +37,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "eventName",
     "displayName": "Data layer event name",
     "simpleValueType": true,
+    "alwaysInSummary": true,
     "defaultValue": "backona_bot_detect",
     "valueValidators": [
       {
@@ -68,7 +69,7 @@ ___TEMPLATE_PARAMETERS___
       {
         "type": "LABEL",
         "name": "hintDataLayerKeys",
-        "displayName": "This tag pushes event (your event name above), ai_bot_status (string detailed status such as false, hidden_bot, integrated_browser:Cursor, ai_bot:GPTBot), and ai_bot_is_bot (boolean). Create Data Layer Variables for ai_bot_status and ai_bot_is_bot. Fire this tag on Initialization or Consent Initialization."
+        "displayName": "This tag pushes event (your event name above), ai_bot_status (string detailed status such as false, webdriver, hidden_bot, ai_bot:GPTBot, ai_bot:Cursor), and ai_bot_is_bot (boolean). Create Data Layer Variables for ai_bot_status and ai_bot_is_bot. Fire this tag on Initialization or Consent Initialization."
       },
       {
         "type": "LABEL",
@@ -272,6 +273,26 @@ scenarios:
     });
 
     assertThat(configValue.checkUserAgent).isEqualTo(false);
+- name: forwards a config-page Cursor marker in addition to the built-in list
+  code: |-
+    let configValue;
+
+    mock('setInWindow', function(key, value) {
+      configValue = value;
+    });
+
+    mock('injectScript', function(url, onSuccess) {
+      onSuccess();
+    });
+
+    runCode({
+      probeScriptUrl: 'https://cdn.jsdelivr.net/gh/backona/gtm-ai-bot-detect@master/probe.js',
+      checkUserAgent: true,
+      additionalAiMarkers: ['Cursor', 'MyAIBot']
+    });
+
+    assertThat(configValue.checkUserAgent).isEqualTo(true);
+    assertThat(configValue.additionalAiMarkers).isEqualTo(['Cursor', 'MyAIBot']);
 
 ___NOTES___
 

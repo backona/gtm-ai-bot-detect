@@ -4,7 +4,7 @@
 homepage: "https://backona.com"
 documentation: "https://github.com/backona/gtm-ai-bot-detect/blob/master/README.md"
 
-versions: []
+versions:
   - sha: b98f216a67f81eb233da5586c9fe06f6fc6fe846
     changeNotes: |
       ### Added

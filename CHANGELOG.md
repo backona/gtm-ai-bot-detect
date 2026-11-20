@@ -11,6 +11,7 @@ Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automa
 ### Added
 ### Changed
 ### Fixed
+- Gallery metadata.yaml versions list is valid YAML, and later releases keep that list valid
 
 ## [0.1.6] - 2026-11-20 (by @slazak)
 ### Added

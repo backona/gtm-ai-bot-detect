@@ -5,6 +5,14 @@ homepage: "https://backona.com"
 documentation: "https://github.com/backona/gtm-ai-bot-detect/blob/master/README.md"
 
 versions: []
+  - sha: b98f216a67f81eb233da5586c9fe06f6fc6fe846
+    changeNotes: |
+      ### Added
+      - README: meaning of each ai_bot_status value, including combined automation and AI crawler statuses
+      ### Changed
+      - ai_bot_status reports `webdriver` when navigator.webdriver is true, instead of the string `true`
+      - Data layer event name is always visible in the GTM tag summary
+      - Predefined AI crawler user agents include Cursor; config-page markers are appended and each built-in user agent still resolves to its own ai_bot name
   - sha: f53518bacecd45d73c0cc64e5718fb57e7bafa16
     changeNotes: |
       ### Changed

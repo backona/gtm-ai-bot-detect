@@ -9,6 +9,11 @@ Do not edit the NEW_VERSION and VERSION_DATE fields, they will be updated automa
 
 ## [<NEW_VERSION>] - <VERSION_DATE>
 ### Added
+### Changed
+### Fixed
+
+## [0.1.6] - 2026-11-20 (by @slazak)
+### Added
 - README: meaning of each ai_bot_status value, including combined automation and AI crawler statuses
 ### Changed
 - ai_bot_status reports `webdriver` when navigator.webdriver is true, instead of the string `true`
